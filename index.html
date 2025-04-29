@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Fútbol 7</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Simulador de Fútbol 7</h1>
+        <p>Gestiona ligas, equipos y jugadores</p>
+    </header>
+
+    <div id="liga-gestion">
+        <h2>Ligas</h2>
+        <button onclick="mostrarFormularioLiga()">Crear Nueva Liga</button>
+        <div id="lista-ligas"></div>
+    </div>
+
+    <div id="form-liga" style="display:none;">
+        <h3>Crear Liga</h3>
+        <input type="text" id="nombre-liga" placeholder="Nombre de la Liga">
+        <input type="file" id="logo-liga">
+        <button onclick="guardarLiga()">Guardar Liga</button>
+    </div>
+
+    <div id="gestion-equipos" style="display:none;">
+        <h2 id="nombre-liga-seleccionada"></h2>
+        <button onclick="agregarEquipo()">Agregar Equipo</button>
+        <div id="equipos"></div>
+    </div>
+
+    <div id="form-equipo" style="display:none;">
+        <h3>Agregar Jugador</h3>
+        <input type="text" id="nombre-jugador" placeholder="Nombre del Jugador">
+        <select id="posicion-jugador">
+            <option value="Portero">Portero</option>
+            <option value="Defensa">Defensa</option>
+            <option value="Pivote">Pivote</option>
+            <option value="Delantero">Delantero</option>
+        </select>
+        <input type="number" id="goles-jugador" placeholder="Goles" value="0">
+        <input type="number" id="asistencias-jugador" placeholder="Asistencias" value="0">
+        <button onclick="agregarJugador()">Agregar Jugador</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
