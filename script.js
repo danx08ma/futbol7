@@ -38,11 +38,17 @@ function guardarLiga() {
             logo: reader.result,
             equipos: []
         };
-        ligas.push(liga);
-        localStorage.setItem("ligas", JSON.stringify(ligas));
-        renderizarLigas();
-        document.getElementById("form-liga").style.display = "none";
+
+        if (ligas.length < 8) {
+            ligas.push(liga);
+            localStorage.setItem("ligas", JSON.stringify(ligas));
+            renderizarLigas();
+            document.getElementById("form-liga").style.display = "none";
+        } else {
+            alert("¡No se pueden agregar más de 8 ligas!");
+        }
     };
+
     if (logo) reader.readAsDataURL(logo);
     else {
         const liga = {
@@ -122,10 +128,14 @@ function guardarJugador() {
         valor: valorJugador
     };
 
-    jugadores.push(jugador);
-    localStorage.setItem("jugadores", JSON.stringify(jugadores));
-    renderizarJugadores();
-    document.getElementById("form-jugador").style.display = "none";
+    if (jugadores.length < 7) {
+        jugadores.push(jugador);
+        localStorage.setItem("jugadores", JSON.stringify(jugadores));
+        renderizarJugadores();
+        document.getElementById("form-jugador").style.display = "none";
+    } else {
+        alert("¡Un equipo no puede tener más de 7 jugadores!");
+    }
 }
 
 mostrarLigas();
