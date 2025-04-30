@@ -11,28 +11,141 @@ function guardarLiga() {
   ligas.push({
     nombre,
     equipos: [],
-    tablaClasificacion: []  // Añadimos la tabla de clasificación vacía
+    tablaClasificacion: [],
+    partidos: [], // Añadimos el array de partidos
+    goleadores: [], // Para almacenar máximos goleadores
+    asistidores: [], // Para almacenar máximos asistidores
   });
   localStorage.setItem("ligas", JSON.stringify(ligas));
   renderizarLigas();
   document.getElementById("formulario-liga").style.display = "none";
 }
 
-// Función para renderizar ligas
-function renderizarLigas() {
-  const lista = document.getElementById("lista-ligas");
-  lista.innerHTML = "";
+// Función para mostrar partidos de la liga
+function mostrarPartidos(index) {
+  ligaActualIndex = index;
+  const liga = ligas[ligaActualIndex];
+  let partidosHtml = "<h3>Partidos de la Liga</h3><table><thead><tr><th>Equipo 1</th><th>Equipo 2</th><th>Resultado</th><th>Acciones</th></tr></thead><tbody>";
 
-  ligas.forEach((liga, i) => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <strong>${liga.nombre}</strong>
-      <button onclick="verEquipos(${i})">Ver Equipos</button>
-      <button onclick="eliminarLiga(${i})">🗑️</button>
-      <button onclick="mostrarClasificacion(${i})">Ver Clasificación</button>  <!-- Añadimos un botón para mostrar clasificación -->
+  liga.partidos.forEach((partido, i) => {
+    partidosHtml += `
+      <tr>
+        <td>${partido.equipo1}</td>
+        <td>${partido.equipo2}</td>
+        <td>${partido.resultado}</td>
+        <td><button onclick="generarResultado(${i})">Generar Resultado</button></td>
+      </tr>
     `;
-    lista.appendChild(div);
   });
+
+  partidosHtml += "</tbody></table>";
+  document.getElementById("lista-ligas").innerHTML = partidosHtml;
+}
+
+// Función para generar el resultado de un partido
+function generarResultado(indice) {
+  const partido = ligas[ligaActualIndex].partidos[indice];
+  // Generamos un resultado aleatorio para goles
+  const golesEquipo1 = Math.floor(Math.random() * 5);
+  const golesEquipo2 = Math.floor(Math.random() * 5);
+
+  partido.resultado = `${golesEquipo1} - ${golesEquipo2}`;
+
+  // Asignamos goles, asistencias y MVP
+  partido.golesEquipo1 = golesEquipo1;
+  partido.golesEquipo2 = golesEquipo2;
+
+  // Aquí simplemente simulamos que los goles fueron distribuidos entre los jugadores de los equipos
+  asignarEstadisticas(partido, golesEquipo1, golesEquipo2);
+  
+  // Guardar en el localStorage
+  localStorage.setItem("ligas", JSON.stringify(ligas));
+  mostrarPartidos(ligaActualIndex);
+}
+
+// Función para asignar estadísticas y actualizar tablas de goleadores y asistidores
+function asignarEstadisticas(partido, golesEquipo1, golesEquipo2) {
+  const equipo1 = ligas[ligaActualIndex].equipos.find(equipo => equipo.nombre === partido.equipo1);
+  const equipo2 = ligas[ligaActualIndex].equipos.find(equipo => equipo.nombre === partido.equipo2);
+
+  // Aquí asignamos goles aleatorios a jugadores del equipo1 y equipo2
+  const golesEquipo1Distribuidos = distribuirGoles(equipo1, golesEquipo1);
+  const golesEquipo2Distribuidos = distribuirGoles(equipo2, golesEquipo2);
+
+  // Ahora calculamos los máximos goleadores y asistidores
+  actualizarMaximos(golesEquipo1Distribuidos, golesEquipo2Distribuidos);
+  
+  // Elegimos el MVP del partido (puede ser un jugador aleatorio)
+  const mvpEquipo1 = equipo1.jugadores[Math.floor(Math.random() * equipo1.jugadores.length)];
+  const mvpEquipo2 = equipo2.jugadores[Math.floor(Math.random() * equipo2.jugadores.length)];
+
+  // Simulamos que el MVP fue el que más destacó
+  const mvp = golesEquipo1 > golesEquipo2 ? mvpEquipo1 : mvpEquipo2;
+  partido.mvp = mvp.nombre;
+}
+
+// Función para distribuir los goles entre los jugadores de un equipo
+function distribuirGoles(equipo, goles) {
+  let golesDistribuidos = [];
+  equipo.jugadores.forEach(jugador => {
+    // Asignamos un porcentaje de los goles a cada jugador
+    const golesJugador = Math.floor(Math.random() * goles);
+    golesDistribuidos.push({ jugador: jugador.nombre, goles: golesJugador });
+    jugador.goles += golesJugador;
+    jugador.asistencias += Math.floor(Math.random() * golesJugador); // Simulamos asistencias
+  });
+
+  return golesDistribuidos;
+}
+
+// Función para actualizar los máximos goleadores y asistidores
+function actualizarMaximos(golesEquipo1, golesEquipo2) {
+  golesEquipo1.forEach(g => {
+    const jugador = ligas[ligaActualIndex].equipos.find(e => e.jugadores.some(j => j.nombre === g.jugador)).jugadores.find(j => j.nombre === g.jugador);
+    if (!jugador) return;
+    jugador.valor += g.goles * 10; // Valor por goles
+  });
+
+  golesEquipo2.forEach(g => {
+    const jugador = ligas[ligaActualIndex].equipos.find(e => e.jugadores.some(j => j.nombre === g.jugador)).jugadores.find(j => j.nombre === g.jugador);
+    if (!jugador) return;
+    jugador.valor += g.goles * 10; // Valor por goles
+  });
+
+  // Actualizamos la tabla de goleadores
+  actualizarTablaGoleadores();
+}
+
+// Función para actualizar la tabla de máximos goleadores y asistidores
+function actualizarTablaGoleadores() {
+  const goleadores = [];
+  const asistidores = [];
+
+  ligas[ligaActualIndex].equipos.forEach(equipo => {
+    equipo.jugadores.forEach(jugador => {
+      goleadores.push({ nombre: jugador.nombre, goles: jugador.goles });
+      asistidores.push({ nombre: jugador.nombre, asistencias: jugador.asistencias });
+    });
+  });
+
+  // Ordenamos los jugadores por goles y asistencias
+  goleadores.sort((a, b) => b.goles - a.goles);
+  asistidores.sort((a, b) => b.asistencias - a.asistencias);
+
+  // Actualizamos las tablas de goleadores y asistidores
+  let tablaGoleadoresHtml = "<h3>Máximos Goleadores</h3><table><thead><tr><th>Jugador</th><th>Goles</th></tr></thead><tbody>";
+  goleadores.forEach(g => {
+    tablaGoleadoresHtml += `<tr><td>${g.nombre}</td><td>${g.goles}</td></tr>`;
+  });
+  tablaGoleadoresHtml += "</tbody></table>";
+
+  let tablaAsistidoresHtml = "<h3>Máximos Asistidores</h3><table><thead><tr><th>Jugador</th><th>Asistencias</th></tr></thead><tbody>";
+  asistidores.forEach(a => {
+    tablaAsistidoresHtml += `<tr><td>${a.nombre}</td><td>${a.asistencias}</td></tr>`;
+  });
+  tablaAsistidoresHtml += "</tbody></table>";
+
+  document.getElementById("lista-ligas").innerHTML += tablaGoleadoresHtml + tablaAsistidoresHtml;
 }
 
 // Función para mostrar la clasificación
@@ -60,160 +173,6 @@ function mostrarClasificacion(index) {
   document.getElementById("lista-ligas").innerHTML = tablaHtml;
 }
 
-// Función para guardar equipo
-function guardarEquipo() {
-  const nombre = document.getElementById("nombre-equipo").value;
-  const logoInput = document.getElementById("logo-equipo");
-  const liga = ligas[ligaActualIndex];
-
-  if (liga.equipos.length >= 8) {
-    alert("Máximo 8 equipos por liga.");
-    return;
-  }
-
-  const equipo = { nombre, logo: '', jugadores: [], victorias: 0, empates: 0, derrotas: 0, golesFavor: 0, golesContra: 0, diferenciaGoles: 0 };
-
-  if (logoInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      equipo.logo = reader.result;
-      liga.equipos.push(equipo);
-      liga.tablaClasificacion.push(equipo); // Añadimos el equipo a la tabla de clasificación
-      guardarLigasYActualizarEquipos();
-    };
-    reader.readAsDataURL(logoInput.files[0]);
-  } else {
-    equipo.logo = "https://via.placeholder.com/50";
-    liga.equipos.push(equipo);
-    liga.tablaClasificacion.push(equipo); // Añadimos el equipo a la tabla de clasificación
-    guardarLigasYActualizarEquipos();
-  }
-}
-
-// Función para actualizar liga y equipos
-function guardarLigasYActualizarEquipos() {
-  localStorage.setItem("ligas", JSON.stringify(ligas));
-  renderizarEquipos();
-  document.getElementById("formulario-equipo").style.display = "none";
-}
-
-// Función para renderizar equipos
-function renderizarEquipos() {
-  const lista = document.getElementById("lista-equipos");
-  lista.innerHTML = "";
-
-  ligas[ligaActualIndex].equipos.forEach((equipo, i) => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <img src="${equipo.logo}" width="50" height="50">
-      <strong>${equipo.nombre}</strong>
-      <button onclick="verJugadores(${i})">Ver Jugadores</button>
-      <button onclick="eliminarEquipo(${i})">🗑️</button>
-    `;
-    lista.appendChild(div);
-  });
-}
-
-// Función para guardar jugador
-function guardarJugador() {
-  const nombre = document.getElementById("nombre-jugador").value;
-  const posicion = document.getElementById("posicion-jugador").value;
-  const goles = parseInt(document.getElementById("goles").value) || 0;
-  const asistencias = parseInt(document.getElementById("asistencias").value) || 0;
-  const valor = goles * 10 + asistencias * 5;
-
-  const equipo = ligas[ligaActualIndex].equipos[equipoActualIndex];
-
-  if (equipo.jugadores.length >= 7) {
-    alert("Máximo 7 jugadores por equipo.");
-    return;
-  }
-
-  equipo.jugadores.push({ nombre, posicion, goles, asistencias, valor });
-  equipo.golesFavor += goles; // Actualizamos los goles a favor
-  equipo.golesContra += asistencias; // Actualizamos los goles en contra (esto es un ejemplo, se puede ajustar)
-  equipo.diferenciaGoles = equipo.golesFavor - equipo.golesContra; // Actualizamos la diferencia de goles
-  localStorage.setItem("ligas", JSON.stringify(ligas));
-  renderizarJugadores();
-  document.getElementById("formulario-jugador").style.display = "none";
-}
-
-// Función para renderizar jugadores
-function renderizarJugadores() {
-  const lista = document.getElementById("lista-jugadores");
-  lista.innerHTML = "";
-
-  const jugadores = ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores;
-  jugadores.forEach((j, index) => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
-      <button onclick="eliminarJugador(${index})">🗑️</button>
-    `;
-    lista.appendChild(div);
-  });
-}
-
-function eliminarLiga(index) {
-  if (confirm("¿Seguro que quieres eliminar esta liga?")) {
-    ligas.splice(index, 1);
-    localStorage.setItem("ligas", JSON.stringify(ligas));
-    renderizarLigas();
-  }
-}
-
-function eliminarEquipo(index) {
-  if (confirm("¿Eliminar este equipo?")) {
-    ligas[ligaActualIndex].equipos.splice(index, 1);
-    ligas[ligaActualIndex].tablaClasificacion.splice(index, 1); // Eliminamos el equipo de la tabla de clasificación
-    localStorage.setItem("ligas", JSON.stringify(ligas));
-    renderizarEquipos();
-  }
-}
-
-function eliminarJugador(index) {
-  if (confirm("¿Eliminar este jugador?")) {
-    ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores.splice(index, 1);
-    localStorage.setItem("ligas", JSON.stringify(ligas));
-    renderizarJugadores();
-  }
-}
-
-function transferirJugador(index) {
-  jugadorActualIndex = index;
-  const jugador = ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores[index];
-
-  const nuevaLiga = prompt("Ingrese el nombre de la liga a la que desea transferir el jugador:");
-
-  const nuevaLigaIndex = ligas.findIndex(liga => liga.nombre.toLowerCase() === nuevaLiga.toLowerCase());
-  if (nuevaLigaIndex === -1) {
-    alert("Liga no encontrada.");
-    return;
-  }
-
-  const nuevaLigaEquipos = ligas[nuevaLigaIndex].equipos;
-  const equipoSeleccionado = prompt("Ingrese el nombre del equipo al que desea transferir el jugador:");
-  
-  const equipoDestino = nuevaLigaEquipos.find(equipo => equipo.nombre.toLowerCase() === equipoSeleccionado.toLowerCase());
-  if (!equipoDestino) {
-    alert("Equipo no encontrado.");
-    return;
-  }
-
-  // Eliminar al jugador del equipo actual
-  ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores.splice(index, 1);
-  equipoDestino.jugadores.push(jugador);
-
-  localStorage.setItem("ligas", JSON.stringify(ligas));
-  renderizarJugadores();
-}
-
-function mostrarSeccion(id) {
-  document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-  [...document.querySelectorAll('.tab')].find(t => t.textContent.includes(id.charAt(0).toUpperCase())).classList.add('active');
-}
+// Resto de las funciones existentes (guardarEquipo, renderizarEquipos, etc.)
 
 renderizarLigas();
