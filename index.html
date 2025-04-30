@@ -129,44 +129,6 @@
       <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
       <button onclick="guardarLiga()">Guardar Liga</button>
     </div>
-
-    <!-- Tabla de máximos goleadores y asistidores -->
-    <h3>Máximos Goleadores y Asistidores</h3>
-    <table id="tabla-maximos" style="width:100%; border-collapse: collapse;">
-      <thead>
-        <tr>
-          <th>Jugador</th>
-          <th>Goles</th>
-          <th>Asistencias</th>
-        </tr>
-      </thead>
-      <tbody id="maximos-body">
-        <!-- Aquí se llenarán los datos dinámicamente -->
-      </tbody>
-    </table>
-
-    <!-- Jornada de partidos -->
-    <h3>Jornada de Partidos</h3>
-    <div id="partidos-jornada">
-      <!-- Los partidos de cada jornada se agregarán aquí -->
-      <div class="partido">
-        <h4>Partido 1</h4>
-        <label for="equipo1">Equipo 1:</label>
-        <input type="text" id="equipo1" placeholder="Equipo 1">
-        <label for="equipo2">Equipo 2:</label>
-        <input type="text" id="equipo2" placeholder="Equipo 2">
-        <button onclick="agregarResultado('equipo1', 'equipo2')">Registrar Resultado</button>
-
-        <h5>Estadísticas del Partido:</h5>
-        <label for="goles-e1">Goles Equipo 1:</label>
-        <input type="number" id="goles-e1" placeholder="Goles">
-        <label for="goles-e2">Goles Equipo 2:</label>
-        <input type="number" id="goles-e2" placeholder="Goles">
-        <label for="mvp">MVP:</label>
-        <input type="text" id="mvp" placeholder="Jugador MVP">
-        <button onclick="guardarEstadisticas()">Guardar Estadísticas</button>
-      </div>
-    </div>
   </section>
 
   <!-- Sección de Equipos -->
@@ -231,18 +193,6 @@
       if (id === 'ligas') document.querySelector('.tab:nth-child(1)').classList.add('active');
       else if (id === 'equipos') document.querySelector('.tab:nth-child(2)').classList.add('active');
       else if (id === 'jugadores') document.querySelector('.tab:nth-child(3)').classList.add('active');
-    }
-
-    // Función para agregar un resultado
-    function agregarResultado(equipo1, equipo2) {
-      // Aquí agregarás la lógica para registrar el resultado de los partidos.
-      console.log(`Resultado agregado entre ${equipo1} y ${equipo2}`);
-    }
-
-    // Función para guardar estadísticas
-    function guardarEstadisticas() {
-      // Aquí agregarás la lógica para guardar estadísticas (goles, asistencias, MVP)
-      console.log("Estadísticas guardadas");
     }
   </script>
 </body>
