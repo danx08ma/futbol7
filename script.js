@@ -146,3 +146,26 @@ function renderizarJugadores() {
 
 // Inicial
 renderizarLigas();
+function eliminarLiga(index) {
+  if (confirm("¿Seguro que quieres eliminar esta liga?")) {
+    ligas.splice(index, 1);
+    localStorage.setItem("ligas", JSON.stringify(ligas));
+    renderizarLigas();
+  }
+}
+
+function eliminarEquipo(index) {
+  if (confirm("¿Eliminar este equipo?")) {
+    ligas[ligaActualIndex].equipos.splice(index, 1);
+    localStorage.setItem("ligas", JSON.stringify(ligas));
+    renderizarEquipos();
+  }
+}
+
+function eliminarJugador(index) {
+  if (confirm("¿Eliminar este jugador?")) {
+    ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores.splice(index, 1);
+    localStorage.setItem("ligas", JSON.stringify(ligas));
+    renderizarJugadores();
+  }
+}
