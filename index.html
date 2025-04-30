@@ -4,58 +4,95 @@
   <meta charset="UTF-8">
   <title>Simulador Fútbol 7</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #4caf50;
+      color: white;
+    }
+
+    .seccion {
+      display: none;
+    }
+
+    .seccion.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <h1>Simulador de Fútbol 7</h1>
 
-  <!-- Apartado de Ligas -->
-  <section id="ligas">
+  <!-- Navegación tipo YouTube -->
+  <div class="tabs">
+    <div class="tab active" onclick="mostrarSeccion('ligas')">🏆 Ligas</div>
+    <div class="tab" onclick="mostrarSeccion('equipos')">🧢 Equipos</div>
+    <div class="tab" onclick="mostrarSeccion('jugadores')">🧍‍♂️ Jugadores</div>
+  </div>
+
+  <!-- Sección de Ligas -->
+  <section id="ligas" class="seccion active">
     <h2>Ligas</h2>
     <button onclick="mostrarFormularioLiga()">Agregar Liga</button>
     <div id="lista-ligas"></div>
+    <div id="formulario-liga" style="display:none;">
+      <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
+      <button onclick="guardarLiga()">Guardar Liga</button>
+    </div>
   </section>
 
-  <!-- Apartado de Equipos -->
-  <section id="equipos" style="display:none;">
+  <!-- Sección de Equipos -->
+  <section id="equipos" class="seccion">
     <h2>Equipos</h2>
     <button onclick="mostrarFormularioEquipo()">Agregar Equipo</button>
-    <button onclick="volverALigas()">Volver a Ligas</button>
     <div id="lista-equipos"></div>
+    <div id="formulario-equipo" style="display:none;">
+      <input type="text" id="nombre-equipo" placeholder="Nombre del equipo">
+      <input type="file" id="logo-equipo">
+      <button onclick="guardarEquipo()">Guardar Equipo</button>
+    </div>
   </section>
 
-  <!-- Apartado de Jugadores -->
-  <section id="jugadores" style="display:none;">
+  <!-- Sección de Jugadores -->
+  <section id="jugadores" class="seccion">
     <h2>Jugadores</h2>
     <button onclick="mostrarFormularioJugador()">Agregar Jugador</button>
-    <button onclick="volverAEquipos()">Volver a Equipos</button>
     <div id="lista-jugadores"></div>
+    <div id="formulario-jugador" style="display:none;">
+      <input type="text" id="nombre-jugador" placeholder="Nombre del jugador">
+      <select id="posicion-jugador">
+        <option>Portero</option>
+        <option>Defensa</option>
+        <option>Pivote</option>
+        <option>Delantero</option>
+      </select>
+      <input type="number" id="goles" placeholder="Goles">
+      <input type="number" id="asistencias" placeholder="Asistencias">
+      <button onclick="guardarJugador()">Guardar Jugador</button>
+    </div>
   </section>
 
-  <!-- Formularios -->
-  <div id="formulario-liga" style="display:none;">
-    <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
-    <button onclick="guardarLiga()">Guardar Liga</button>
-  </div>
-
-  <div id="formulario-equipo" style="display:none;">
-    <input type="text" id="nombre-equipo" placeholder="Nombre del equipo">
-    <input type="file" id="logo-equipo">
-    <button onclick="guardarEquipo()">Guardar Equipo</button>
-  </div>
-
-  <div id="formulario-jugador" style="display:none;">
-    <input type="text" id="nombre-jugador" placeholder="Nombre del jugador">
-    <select id="posicion-jugador">
-      <option>Portero</option>
-      <option>Defensa</option>
-      <option>Pivote</option>
-      <option>Delantero</option>
-    </select>
-    <input type="number" id="goles" placeholder="Goles">
-    <input type="number" id="asistencias" placeholder="Asistencias">
-    <button onclick="guardarJugador()">Guardar Jugador</button>
-  </div>
-
   <script src="script.js"></script>
+  <script>
+    function mostrarSeccion(id) {
+      document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      [...document.querySelectorAll('.tab')].find(t => t.textContent.includes(id.charAt(0).toUpperCase())).classList.add('active');
+    }
+  </script>
 </body>
 </html>
