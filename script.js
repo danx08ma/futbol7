@@ -1,6 +1,7 @@
 let ligas = JSON.parse(localStorage.getItem('ligas')) || [];
 let ligaActualIndex = null;
 let equipoActualIndex = null;
+let jugadorActualIndex = null; // Para el seguimiento de los jugadores
 
 function guardarLiga() {
   const nombre = document.getElementById("nombre-liga").value;
@@ -138,6 +139,7 @@ function renderizarJugadores() {
     div.innerHTML = `
       <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
       <button onclick="eliminarJugador(${index})">🗑️</button>
+      <button onclick="transferirJugador(${index})">Transferir</button>
     `;
     lista.appendChild(div);
   });
@@ -165,6 +167,35 @@ function eliminarJugador(index) {
     localStorage.setItem("ligas", JSON.stringify(ligas));
     renderizarJugadores();
   }
+}
+
+function transferirJugador(index) {
+  jugadorActualIndex = index;
+  const jugador = ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores[index];
+
+  const nuevaLiga = prompt("Ingrese el nombre de la liga a la que desea transferir el jugador:");
+
+  const nuevaLigaIndex = ligas.findIndex(liga => liga.nombre.toLowerCase() === nuevaLiga.toLowerCase());
+  if (nuevaLigaIndex === -1) {
+    alert("Liga no encontrada.");
+    return;
+  }
+
+  const nuevaLigaEquipos = ligas[nuevaLigaIndex].equipos;
+  const equipoSeleccionado = prompt("Ingrese el nombre del equipo al que desea transferir el jugador:");
+  
+  const equipoDestino = nuevaLigaEquipos.find(equipo => equipo.nombre.toLowerCase() === equipoSeleccionado.toLowerCase());
+  if (!equipoDestino) {
+    alert("Equipo no encontrado.");
+    return;
+  }
+
+  // Eliminar al jugador del equipo actual
+  ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores.splice(index, 1);
+  equipoDestino.jugadores.push(jugador);
+
+  localStorage.setItem("ligas", JSON.stringify(ligas));
+  renderizarJugadores();
 }
 
 function mostrarSeccion(id) {
