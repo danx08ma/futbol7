@@ -19,8 +19,11 @@ function renderizarLigas() {
   ligas.forEach((liga, i) => {
     const div = document.createElement("div");
     div.innerHTML = `
-      <strong>${liga.nombre}</strong>
-      <button onclick="verEquipos(${i})">Ver Equipos</button>
+  <strong>${liga.nombre}</strong>
+  <button onclick="verEquipos(${i})">Ver Equipos</button>
+  <button onclick="eliminarLiga(${i})">🗑️</button>
+`;
+
     `;
     lista.appendChild(div);
   });
@@ -95,9 +98,12 @@ function renderizarEquipos() {
   ligas[ligaActualIndex].equipos.forEach((equipo, i) => {
     const div = document.createElement("div");
     div.innerHTML = `
-      <img src="${equipo.logo}" width="50" height="50">
-      <strong>${equipo.nombre}</strong>
-      <button onclick="verJugadores(${i})">Ver Jugadores</button>
+  <img src="${equipo.logo}" width="50" height="50">
+  <strong>${equipo.nombre}</strong>
+  <button onclick="verJugadores(${i})">Ver Jugadores</button>
+  <button onclick="eliminarEquipo(${i})">🗑️</button>
+`;
+
     `;
     lista.appendChild(div);
   });
@@ -138,7 +144,10 @@ function renderizarJugadores() {
   jugadores.forEach(j => {
     const div = document.createElement("div");
     div.innerHTML = `
-      <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
+  <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
+  <button onclick="eliminarJugador(${index})">🗑️</button>
+`;
+
     `;
     lista.appendChild(div);
   });
