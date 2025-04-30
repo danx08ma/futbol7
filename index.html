@@ -5,6 +5,15 @@
   <title>Simulador Fútbol 7</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* Estilos para el modo oscuro */
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
     .tabs {
       display: flex;
       gap: 10px;
@@ -13,7 +22,7 @@
 
     .tab {
       padding: 10px 20px;
-      background: #ddd;
+      background: #444;
       border-radius: 10px;
       cursor: pointer;
     }
@@ -30,10 +39,59 @@
     .seccion.active {
       display: block;
     }
+
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="number"], input[type="file"], select {
+      padding: 8px;
+      width: 100%;
+      margin-top: 5px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+    }
+
+    /* Modo claro */
+    .light-mode body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .light-mode .tab {
+      background: #ddd;
+    }
+
+    .light-mode .tab.active {
+      background: #4caf50;
+      color: white;
+    }
+
+    .light-mode button {
+      background: #4caf50;
+      color: white;
+    }
+
+    .light-mode input[type="text"], .light-mode input[type="number"], .light-mode input[type="file"], .light-mode select {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
   <h1>Simulador de Fútbol 7</h1>
+
+  <!-- Botón para cambiar entre modos claro y oscuro -->
+  <button onclick="toggleDarkMode()">🌙 / 🌞 Cambiar Modo</button>
 
   <!-- Navegación tipo YouTube -->
   <div class="tabs">
@@ -86,6 +144,12 @@
 
   <script src="script.js"></script>
   <script>
+    // Cambiar entre modo oscuro y claro
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('light-mode');
+    }
+
     function mostrarSeccion(id) {
       document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
       document.getElementById(id).classList.add('active');
