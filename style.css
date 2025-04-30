@@ -101,3 +101,31 @@ button:hover {
 button:active {
   background-color: #388e3c;
 }
+
+/* Botones de retroceder */
+.retroceder {
+  background-color: #f44336;
+  padding: 5px 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.retroceder:hover {
+  background-color: #d32f2f;
+}
+
+/* Estilos de los botones de transferencia */
+.transferir {
+  background-color: #2196F3;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.transferir:hover {
+  background-color: #1976D2;
+}
