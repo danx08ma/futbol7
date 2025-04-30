@@ -3,16 +3,22 @@ let ligaActualIndex = null;
 let equipoActualIndex = null;
 let jugadorActualIndex = null; // Para el seguimiento de los jugadores
 
+// Función para agregar la liga
 function guardarLiga() {
   const nombre = document.getElementById("nombre-liga").value;
   if (!nombre) return;
 
-  ligas.push({ nombre, equipos: [] });
+  ligas.push({
+    nombre,
+    equipos: [],
+    tablaClasificacion: []  // Añadimos la tabla de clasificación vacía
+  });
   localStorage.setItem("ligas", JSON.stringify(ligas));
   renderizarLigas();
   document.getElementById("formulario-liga").style.display = "none";
 }
 
+// Función para renderizar ligas
 function renderizarLigas() {
   const lista = document.getElementById("lista-ligas");
   lista.innerHTML = "";
@@ -23,37 +29,38 @@ function renderizarLigas() {
       <strong>${liga.nombre}</strong>
       <button onclick="verEquipos(${i})">Ver Equipos</button>
       <button onclick="eliminarLiga(${i})">🗑️</button>
+      <button onclick="mostrarClasificacion(${i})">Ver Clasificación</button>  <!-- Añadimos un botón para mostrar clasificación -->
     `;
     lista.appendChild(div);
   });
 }
 
-function mostrarFormularioLiga() {
-  document.getElementById("formulario-liga").style.display = "block";
-}
-
-function mostrarFormularioEquipo() {
-  document.getElementById("formulario-equipo").style.display = "block";
-}
-
-function mostrarFormularioJugador() {
-  document.getElementById("formulario-jugador").style.display = "block";
-}
-
-function verEquipos(index) {
+// Función para mostrar la clasificación
+function mostrarClasificacion(index) {
   ligaActualIndex = index;
-  mostrarSeccion("equipos");
-  renderizarEquipos();
+  const liga = ligas[ligaActualIndex];
+  let tablaHtml = "<h3>Tabla de Clasificación</h3><table><thead><tr><th>Puesto</th><th>Equipo</th><th>Victorias</th><th>Empates</th><th>Derrotas</th><th>GF</th><th>GC</th><th>Diferencia de Goles</th></tr></thead><tbody>";
+
+  liga.tablaClasificacion.forEach((equipo, i) => {
+    tablaHtml += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${equipo.nombre}</td>
+        <td>${equipo.victorias}</td>
+        <td>${equipo.empates}</td>
+        <td>${equipo.derrotas}</td>
+        <td>${equipo.golesFavor}</td>
+        <td>${equipo.golesContra}</td>
+        <td>${equipo.diferenciaGoles}</td>
+      </tr>
+    `;
+  });
+
+  tablaHtml += "</tbody></table>";
+  document.getElementById("lista-ligas").innerHTML = tablaHtml;
 }
 
-function volverALigas() {
-  mostrarSeccion("ligas");
-}
-
-function volverAEquipos() {
-  mostrarSeccion("equipos");
-}
-
+// Función para guardar equipo
 function guardarEquipo() {
   const nombre = document.getElementById("nombre-equipo").value;
   const logoInput = document.getElementById("logo-equipo");
@@ -64,29 +71,33 @@ function guardarEquipo() {
     return;
   }
 
-  const equipo = { nombre, logo: '', jugadores: [] };
+  const equipo = { nombre, logo: '', jugadores: [], victorias: 0, empates: 0, derrotas: 0, golesFavor: 0, golesContra: 0, diferenciaGoles: 0 };
 
   if (logoInput.files[0]) {
     const reader = new FileReader();
     reader.onload = () => {
       equipo.logo = reader.result;
       liga.equipos.push(equipo);
+      liga.tablaClasificacion.push(equipo); // Añadimos el equipo a la tabla de clasificación
       guardarLigasYActualizarEquipos();
     };
     reader.readAsDataURL(logoInput.files[0]);
   } else {
     equipo.logo = "https://via.placeholder.com/50";
     liga.equipos.push(equipo);
+    liga.tablaClasificacion.push(equipo); // Añadimos el equipo a la tabla de clasificación
     guardarLigasYActualizarEquipos();
   }
 }
 
+// Función para actualizar liga y equipos
 function guardarLigasYActualizarEquipos() {
   localStorage.setItem("ligas", JSON.stringify(ligas));
   renderizarEquipos();
   document.getElementById("formulario-equipo").style.display = "none";
 }
 
+// Función para renderizar equipos
 function renderizarEquipos() {
   const lista = document.getElementById("lista-equipos");
   lista.innerHTML = "";
@@ -103,12 +114,7 @@ function renderizarEquipos() {
   });
 }
 
-function verJugadores(index) {
-  equipoActualIndex = index;
-  mostrarSeccion("jugadores");
-  renderizarJugadores();
-}
-
+// Función para guardar jugador
 function guardarJugador() {
   const nombre = document.getElementById("nombre-jugador").value;
   const posicion = document.getElementById("posicion-jugador").value;
@@ -124,11 +130,15 @@ function guardarJugador() {
   }
 
   equipo.jugadores.push({ nombre, posicion, goles, asistencias, valor });
+  equipo.golesFavor += goles; // Actualizamos los goles a favor
+  equipo.golesContra += asistencias; // Actualizamos los goles en contra (esto es un ejemplo, se puede ajustar)
+  equipo.diferenciaGoles = equipo.golesFavor - equipo.golesContra; // Actualizamos la diferencia de goles
   localStorage.setItem("ligas", JSON.stringify(ligas));
   renderizarJugadores();
   document.getElementById("formulario-jugador").style.display = "none";
 }
 
+// Función para renderizar jugadores
 function renderizarJugadores() {
   const lista = document.getElementById("lista-jugadores");
   lista.innerHTML = "";
@@ -139,7 +149,6 @@ function renderizarJugadores() {
     div.innerHTML = `
       <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
       <button onclick="eliminarJugador(${index})">🗑️</button>
-      <button onclick="transferirJugador(${index})">Transferir</button>
     `;
     lista.appendChild(div);
   });
@@ -156,6 +165,7 @@ function eliminarLiga(index) {
 function eliminarEquipo(index) {
   if (confirm("¿Eliminar este equipo?")) {
     ligas[ligaActualIndex].equipos.splice(index, 1);
+    ligas[ligaActualIndex].tablaClasificacion.splice(index, 1); // Eliminamos el equipo de la tabla de clasificación
     localStorage.setItem("ligas", JSON.stringify(ligas));
     renderizarEquipos();
   }
