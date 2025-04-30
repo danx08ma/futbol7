@@ -5,7 +5,7 @@
   <title>Simulador Fútbol 7</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Estilos para el modo oscuro */
+    /* Modo oscuro */
     body {
       background-color: #121212;
       color: #e0e0e0;
@@ -115,6 +115,7 @@
   <section id="equipos" class="seccion">
     <h2>Equipos</h2>
     <button onclick="mostrarFormularioEquipo()">Agregar Equipo</button>
+    <button onclick="volverALigas()">Volver a Ligas</button>
     <div id="lista-equipos"></div>
     <div id="formulario-equipo" style="display:none;">
       <input type="text" id="nombre-equipo" placeholder="Nombre del equipo">
@@ -127,6 +128,7 @@
   <section id="jugadores" class="seccion">
     <h2>Jugadores</h2>
     <button onclick="mostrarFormularioJugador()">Agregar Jugador</button>
+    <button onclick="volverAEquipos()">Volver a Equipos</button>
     <div id="lista-jugadores"></div>
     <div id="formulario-jugador" style="display:none;">
       <input type="text" id="nombre-jugador" placeholder="Nombre del jugador">
@@ -140,11 +142,24 @@
       <input type="number" id="asistencias" placeholder="Asistencias">
       <button onclick="guardarJugador()">Guardar Jugador</button>
     </div>
+    <!-- Opciones para transferir jugadores -->
+    <div id="opciones-transferencia">
+      <button onclick="transferirJugador()">Transferir Jugador</button>
+    </div>
   </section>
 
   <script src="script.js"></script>
   <script>
-    // Cambiar entre modo oscuro y claro
+    // Función para retroceder a la sección anterior
+    function volverALigas() {
+      mostrarSeccion("ligas");
+    }
+
+    function volverAEquipos() {
+      mostrarSeccion("equipos");
+    }
+
+    // Función para cambiar entre modo oscuro y claro
     function toggleDarkMode() {
       const body = document.body;
       body.classList.toggle('light-mode');
