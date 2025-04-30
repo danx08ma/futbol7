@@ -91,7 +91,9 @@
       document.getElementById(id).classList.add('active');
 
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      [...document.querySelectorAll('.tab')].find(t => t.textContent.includes(id.charAt(0).toUpperCase())).classList.add('active');
+      if (id === 'ligas') document.querySelector('.tab:nth-child(1)').classList.add('active');
+      else if (id === 'equipos') document.querySelector('.tab:nth-child(2)').classList.add('active');
+      else if (id === 'jugadores') document.querySelector('.tab:nth-child(3)').classList.add('active');
     }
   </script>
 </body>
