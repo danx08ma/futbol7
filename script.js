@@ -41,19 +41,16 @@ function mostrarFormularioJugador() {
 
 function verEquipos(index) {
   ligaActualIndex = index;
-  document.getElementById("ligas").style.display = "none";
-  document.getElementById("equipos").style.display = "block";
+  mostrarSeccion("equipos");
   renderizarEquipos();
 }
 
 function volverALigas() {
-  document.getElementById("ligas").style.display = "block";
-  document.getElementById("equipos").style.display = "none";
+  mostrarSeccion("ligas");
 }
 
 function volverAEquipos() {
-  document.getElementById("equipos").style.display = "block";
-  document.getElementById("jugadores").style.display = "none";
+  mostrarSeccion("equipos");
 }
 
 function guardarEquipo() {
@@ -107,8 +104,7 @@ function renderizarEquipos() {
 
 function verJugadores(index) {
   equipoActualIndex = index;
-  document.getElementById("equipos").style.display = "none";
-  document.getElementById("jugadores").style.display = "block";
+  mostrarSeccion("jugadores");
   renderizarJugadores();
 }
 
@@ -147,7 +143,6 @@ function renderizarJugadores() {
   });
 }
 
-// Eliminar elementos
 function eliminarLiga(index) {
   if (confirm("¿Seguro que quieres eliminar esta liga?")) {
     ligas.splice(index, 1);
@@ -172,6 +167,12 @@ function eliminarJugador(index) {
   }
 }
 
-// Inicial
-renderizarLigas();
+function mostrarSeccion(id) {
+  document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  [...document.querySelectorAll('.tab')].find(t => t.textContent.includes(id.charAt(0).toUpperCase())).classList.add('active');
+}
+
+renderizarLigas();
