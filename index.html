@@ -104,7 +104,27 @@
   <section id="ligas" class="seccion active">
     <h2>Ligas</h2>
     <button onclick="mostrarFormularioLiga()">Agregar Liga</button>
-    <div id="lista-ligas"></div>
+    
+    <!-- Tabla de clasificación -->
+    <h3>Clasificación de Ligas</h3>
+    <table id="tabla-clasificacion" style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Puesto</th>
+          <th>Equipo</th>
+          <th>Victorias</th>
+          <th>Empates</th>
+          <th>Derrotas</th>
+          <th>Goles a Favor</th>
+          <th>Goles en Contra</th>
+          <th>Diferencia de Goles</th>
+        </tr>
+      </thead>
+      <tbody id="clasificacion-body">
+        <!-- Aquí se llenarán los datos dinámicamente -->
+      </tbody>
+    </table>
+
     <div id="formulario-liga" style="display:none;">
       <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
       <button onclick="guardarLiga()">Guardar Liga</button>
