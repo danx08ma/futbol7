@@ -129,3 +129,37 @@ button:active {
 .transferir:hover {
   background-color: #1976D2;
 }
+
+/* Estilos para la tabla de clasificación */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th, .table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #333;
+}
+
+.table th {
+  background-color: #333;
+  color: white;
+}
+
+.table tr:nth-child(even) {
+  background-color: #2c2c2c;
+}
+
+.table tr:hover {
+  background-color: #575757;
+}
+
+.table .posicion {
+  font-weight: bold;
+}
+
+.table .nombre-equipo {
+  color: #4caf50;
+}
