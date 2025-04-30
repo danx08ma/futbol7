@@ -1,180 +1,152 @@
 let ligas = JSON.parse(localStorage.getItem('ligas')) || [];
 let ligaActualIndex = null;
-let equipoActualIndex = null;
-let jugadorActualIndex = null; // Para el seguimiento de los jugadores
 
-// Función para agregar la liga
+// Guardar nueva liga
 function guardarLiga() {
-  const nombre = document.getElementById("nombre-liga").value;
+  const nombre = document.getElementById("nombre-liga").value.trim();
   if (!nombre) return;
 
   ligas.push({
     nombre,
     equipos: [],
-    tablaClasificacion: [],
     partidos: [],
-    goleadores: [],
-    asistidores: [],
+    tablaClasificacion: [],
   });
+
   localStorage.setItem("ligas", JSON.stringify(ligas));
   renderizarLigas();
   document.getElementById("formulario-liga").style.display = "none";
 }
 
-// Función para renderizar todas las ligas
+// Mostrar lista de ligas
 function renderizarLigas() {
-  let ligasHtml = "<h3>Lista de Ligas</h3><ul>";
-  ligas.forEach((liga, index) => {
-    ligasHtml += `
+  let html = "<h3>Lista de Ligas</h3><ul>";
+  ligas.forEach((liga, i) => {
+    html += `
       <li>
         ${liga.nombre}
-        <button onclick="mostrarPartidos(${index})">Ver Partidos</button>
-        <button onclick="mostrarClasificacion(${index})">Ver Clasificación</button>
+        <button onclick="mostrarPartidos(${i})">Partidos</button>
+        <button onclick="mostrarClasificacion(${i})">Clasificación</button>
       </li>
     `;
   });
-  ligasHtml += "</ul>";
-  document.getElementById("lista-ligas").innerHTML = ligasHtml;
+  html += "</ul>";
+  document.getElementById("lista-ligas").innerHTML = html;
 }
 
-// Función para mostrar partidos de la liga
+// Mostrar partidos
 function mostrarPartidos(index) {
   ligaActualIndex = index;
-  const liga = ligas[ligaActualIndex];
-  let partidosHtml = "<h3>Partidos de la Liga</h3><table><thead><tr><th>Equipo 1</th><th>Equipo 2</th><th>Resultado</th><th>Acciones</th></tr></thead><tbody>";
+  const liga = ligas[index];
 
-  liga.partidos.forEach((partido, i) => {
-    partidosHtml += `
+  let html = "<h3>Partidos</h3><table><thead><tr><th>Equipo 1</th><th>Equipo 2</th><th>Resultado</th><th>Acción</th></tr></thead><tbody>";
+  liga.partidos.forEach((p, i) => {
+    html += `
       <tr>
-        <td>${partido.equipo1}</td>
-        <td>${partido.equipo2}</td>
-        <td>${partido.resultado || "Pendiente"}</td>
+        <td>${p.equipo1}</td>
+        <td>${p.equipo2}</td>
+        <td>${p.resultado || 'Pendiente'}</td>
         <td><button onclick="generarResultado(${i})">Generar Resultado</button></td>
       </tr>
     `;
   });
+  html += "</tbody></table>";
 
-  partidosHtml += "</tbody></table>";
-  document.getElementById("lista-ligas").innerHTML = partidosHtml;
+  document.getElementById("lista-ligas").innerHTML = html;
 }
 
-// Función para generar el resultado de un partido
+// Generar resultado aleatorio
 function generarResultado(indice) {
-  const partido = ligas[ligaActualIndex].partidos[indice];
-  const golesEquipo1 = Math.floor(Math.random() * 5);
-  const golesEquipo2 = Math.floor(Math.random() * 5);
+  const liga = ligas[ligaActualIndex];
+  const partido = liga.partidos[indice];
 
-  partido.resultado = `${golesEquipo1} - ${golesEquipo2}`;
-  partido.golesEquipo1 = golesEquipo1;
-  partido.golesEquipo2 = golesEquipo2;
+  const goles1 = Math.floor(Math.random() * 5);
+  const goles2 = Math.floor(Math.random() * 5);
 
-  asignarEstadisticas(partido, golesEquipo1, golesEquipo2);
-  
+  partido.resultado = `${goles1} - ${goles2}`;
+  partido.golesEquipo1 = goles1;
+  partido.golesEquipo2 = goles2;
+
+  actualizarClasificacion(partido.equipo1, partido.equipo2, goles1, goles2);
+
   localStorage.setItem("ligas", JSON.stringify(ligas));
   mostrarPartidos(ligaActualIndex);
 }
 
-// Función para asignar estadísticas y actualizar tablas de goleadores y asistidores
-function asignarEstadisticas(partido, golesEquipo1, golesEquipo2) {
-  const equipo1 = ligas[ligaActualIndex].equipos.find(equipo => equipo.nombre === partido.equipo1);
-  const equipo2 = ligas[ligaActualIndex].equipos.find(equipo => equipo.nombre === partido.equipo2);
+// Actualizar clasificación
+function actualizarClasificacion(equipo1, equipo2, goles1, goles2) {
+  const liga = ligas[ligaActualIndex];
 
-  const golesEquipo1Distribuidos = distribuirGoles(equipo1, golesEquipo1);
-  const golesEquipo2Distribuidos = distribuirGoles(equipo2, golesEquipo2);
+  function obtenerRegistro(nombre) {
+    let reg = liga.tablaClasificacion.find(e => e.nombre === nombre);
+    if (!reg) {
+      reg = {
+        nombre,
+        victorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golesFavor: 0,
+        golesContra: 0,
+        diferenciaGoles: 0,
+      };
+      liga.tablaClasificacion.push(reg);
+    }
+    return reg;
+  }
 
-  actualizarMaximos(golesEquipo1Distribuidos, golesEquipo2Distribuidos);
-  
-  const mvpEquipo1 = equipo1.jugadores[Math.floor(Math.random() * equipo1.jugadores.length)];
-  const mvpEquipo2 = equipo2.jugadores[Math.floor(Math.random() * equipo2.jugadores.length)];
+  const reg1 = obtenerRegistro(equipo1);
+  const reg2 = obtenerRegistro(equipo2);
 
-  const mvp = golesEquipo1 > golesEquipo2 ? mvpEquipo1 : mvpEquipo2;
-  partido.mvp = mvp.nombre;
+  reg1.golesFavor += goles1;
+  reg1.golesContra += goles2;
+  reg1.diferenciaGoles = reg1.golesFavor - reg1.golesContra;
+
+  reg2.golesFavor += goles2;
+  reg2.golesContra += goles1;
+  reg2.diferenciaGoles = reg2.golesFavor - reg2.golesContra;
+
+  if (goles1 > goles2) {
+    reg1.victorias++;
+    reg2.derrotas++;
+  } else if (goles2 > goles1) {
+    reg2.victorias++;
+    reg1.derrotas++;
+  } else {
+    reg1.empates++;
+    reg2.empates++;
+  }
+
+  liga.tablaClasificacion.sort((a, b) => {
+    const puntosA = a.victorias * 3 + a.empates;
+    const puntosB = b.victorias * 3 + b.empates;
+    if (puntosB !== puntosA) return puntosB - puntosA;
+    return b.diferenciaGoles - a.diferenciaGoles;
+  });
 }
 
-// Función para distribuir los goles entre los jugadores de un equipo
-function distribuirGoles(equipo, goles) {
-  let golesDistribuidos = [];
-  equipo.jugadores.forEach(jugador => {
-    const golesJugador = Math.floor(Math.random() * goles);
-    golesDistribuidos.push({ jugador: jugador.nombre, goles: golesJugador });
-    jugador.goles += golesJugador;
-    jugador.asistencias += Math.floor(Math.random() * golesJugador);
-  });
-
-  return golesDistribuidos;
-}
-
-// Función para actualizar los máximos goleadores y asistidores
-function actualizarMaximos(golesEquipo1, golesEquipo2) {
-  golesEquipo1.forEach(g => {
-    const jugador = ligas[ligaActualIndex].equipos.find(e => e.jugadores.some(j => j.nombre === g.jugador)).jugadores.find(j => j.nombre === g.jugador);
-    if (!jugador) return;
-    jugador.valor += g.goles * 10;
-  });
-
-  golesEquipo2.forEach(g => {
-    const jugador = ligas[ligaActualIndex].equipos.find(e => e.jugadores.some(j => j.nombre === g.jugador)).jugadores.find(j => j.nombre === g.jugador);
-    if (!jugador) return;
-    jugador.valor += g.goles * 10;
-  });
-
-  actualizarTablaGoleadores();
-}
-
-// Función para actualizar la tabla de máximos goleadores y asistidores
-function actualizarTablaGoleadores() {
-  const goleadores = [];
-  const asistidores = [];
-
-  ligas[ligaActualIndex].equipos.forEach(equipo => {
-    equipo.jugadores.forEach(jugador => {
-      goleadores.push({ nombre: jugador.nombre, goles: jugador.goles });
-      asistidores.push({ nombre: jugador.nombre, asistencias: jugador.asistencias });
-    });
-  });
-
-  goleadores.sort((a, b) => b.goles - a.goles);
-  asistidores.sort((a, b) => b.asistencias - a.asistencias);
-
-  let tablaGoleadoresHtml = "<h3>Máximos Goleadores</h3><table><thead><tr><th>Jugador</th><th>Goles</th></tr></thead><tbody>";
-  goleadores.forEach(g => {
-    tablaGoleadoresHtml += `<tr><td>${g.nombre}</td><td>${g.goles}</td></tr>`;
-  });
-  tablaGoleadoresHtml += "</tbody></table>";
-
-  let tablaAsistidoresHtml = "<h3>Máximos Asistidores</h3><table><thead><tr><th>Jugador</th><th>Asistencias</th></tr></thead><tbody>";
-  asistidores.forEach(a => {
-    tablaAsistidoresHtml += `<tr><td>${a.nombre}</td><td>${a.asistencias}</td></tr>`;
-  });
-  tablaAsistidoresHtml += "</tbody></table>";
-
-  document.getElementById("lista-ligas").innerHTML += tablaGoleadoresHtml + tablaAsistidoresHtml;
-}
-
-// Función para mostrar la clasificación
+// Mostrar clasificación
 function mostrarClasificacion(index) {
   ligaActualIndex = index;
-  const liga = ligas[ligaActualIndex];
-  let tablaHtml = "<h3>Tabla de Clasificación</h3><table><thead><tr><th>Puesto</th><th>Equipo</th><th>Victorias</th><th>Empates</th><th>Derrotas</th><th>GF</th><th>GC</th><th>Diferencia de Goles</th></tr></thead><tbody>";
+  const tabla = ligas[index].tablaClasificacion;
 
-  liga.tablaClasificacion.forEach((equipo, i) => {
-    tablaHtml += `
+  let html = "<h3>Clasificación</h3><table><thead><tr><th>#</th><th>Equipo</th><th>V</th><th>E</th><th>D</th><th>GF</th><th>GC</th><th>DG</th></tr></thead><tbody>";
+  tabla.forEach((e, i) => {
+    html += `
       <tr>
         <td>${i + 1}</td>
-        <td>${equipo.nombre}</td>
-        <td>${equipo.victorias}</td>
-        <td>${equipo.empates}</td>
-        <td>${equipo.derrotas}</td>
-        <td>${equipo.golesFavor}</td>
-        <td>${equipo.golesContra}</td>
-        <td>${equipo.diferenciaGoles}</td>
+        <td>${e.nombre}</td>
+        <td>${e.victorias}</td>
+        <td>${e.empates}</td>
+        <td>${e.derrotas}</td>
+        <td>${e.golesFavor}</td>
+        <td>${e.golesContra}</td>
+        <td>${e.diferenciaGoles}</td>
       </tr>
     `;
   });
-
-  tablaHtml += "</tbody></table>";
-  document.getElementById("lista-ligas").innerHTML = tablaHtml;
+  html += "</tbody></table>";
+  document.getElementById("lista-ligas").innerHTML = html;
 }
 
-// Inicialización de la página (renderizar ligas al cargar)
+// Al cargar
 renderizarLigas();
