@@ -19,11 +19,9 @@ function renderizarLigas() {
   ligas.forEach((liga, i) => {
     const div = document.createElement("div");
     div.innerHTML = `
-  <strong>${liga.nombre}</strong>
-  <button onclick="verEquipos(${i})">Ver Equipos</button>
-  <button onclick="eliminarLiga(${i})">🗑️</button>
-`;
-
+      <strong>${liga.nombre}</strong>
+      <button onclick="verEquipos(${i})">Ver Equipos</button>
+      <button onclick="eliminarLiga(${i})">🗑️</button>
     `;
     lista.appendChild(div);
   });
@@ -98,12 +96,10 @@ function renderizarEquipos() {
   ligas[ligaActualIndex].equipos.forEach((equipo, i) => {
     const div = document.createElement("div");
     div.innerHTML = `
-  <img src="${equipo.logo}" width="50" height="50">
-  <strong>${equipo.nombre}</strong>
-  <button onclick="verJugadores(${i})">Ver Jugadores</button>
-  <button onclick="eliminarEquipo(${i})">🗑️</button>
-`;
-
+      <img src="${equipo.logo}" width="50" height="50">
+      <strong>${equipo.nombre}</strong>
+      <button onclick="verJugadores(${i})">Ver Jugadores</button>
+      <button onclick="eliminarEquipo(${i})">🗑️</button>
     `;
     lista.appendChild(div);
   });
@@ -141,20 +137,17 @@ function renderizarJugadores() {
   lista.innerHTML = "";
 
   const jugadores = ligas[ligaActualIndex].equipos[equipoActualIndex].jugadores;
-  jugadores.forEach(j => {
+  jugadores.forEach((j, index) => {
     const div = document.createElement("div");
     div.innerHTML = `
-  <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
-  <button onclick="eliminarJugador(${index})">🗑️</button>
-`;
-
+      <strong>${j.nombre}</strong> (${j.posicion}) - Goles: ${j.goles}, Asistencias: ${j.asistencias}, Valor: ${j.valor}
+      <button onclick="eliminarJugador(${index})">🗑️</button>
     `;
     lista.appendChild(div);
   });
 }
 
-// Inicial
-renderizarLigas();
+// Eliminar elementos
 function eliminarLiga(index) {
   if (confirm("¿Seguro que quieres eliminar esta liga?")) {
     ligas.splice(index, 1);
@@ -178,3 +171,7 @@ function eliminarJugador(index) {
     renderizarJugadores();
   }
 }
+
+// Inicial
+renderizarLigas();
+
